@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <unistd.h>
 #define PHILOSOPHES 10
+
+//gcc -o philosophers philosophers.c -lpthread
 pthread_t phil[PHILOSOPHES];
 pthread_mutex_t baguette[PHILOSOPHES];
 
@@ -34,7 +36,7 @@ void* philosophe ( void* arg ){
 		pthread_mutex_unlock(&baguette[right]);
 		//printf("Philosophe [%d] a libéré baguette droite [%d]\n",*id,right);  
 	}
-	printf("philosophe [%d] a mangé %d fois \n",*id,j);
+	//printf("philosophe [%d] a mangé %d fois \n",*id,j);
 	return (NULL);
 }
 
@@ -60,8 +62,6 @@ int main ( int argc, char *argv[])
 
    	return (EXIT_SUCCESS);
 }
-
-
 
 
 
