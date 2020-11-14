@@ -52,18 +52,16 @@ int main ( int argc, char *argv[])
      		id[i]=i;
 
    	for (i = 0; i < PHILOSOPHES; i++)
-      		pthread_mutex_init( &baguette[i], NULL);
+      		pthread_mutex_init(&baguette[i], NULL);
 
    	for (i = 0; i < PHILOSOPHES; i++)
      		pthread_create(&phil[i], NULL, philosophe, (void*)&(id[i]) );
 
    	for (i = 0; i < PHILOSOPHES; i++)
       		pthread_join(phil[i], NULL);
+	
+	for (i = 0; i < PHILOSOPHES; i++)
+      		pthread_mutex_destroy(&baguette[i]);
 
    	return (EXIT_SUCCESS);
 }
-
-
-
-
-
