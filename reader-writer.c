@@ -1,34 +1,7 @@
-#include <pthread.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <unistd.h>
-#include <semaphore.h>
-#define WRITERS 5
-#define READERS 5 
-
+#include "header.h"
 //gcc -o reader-writer reader-writer.c -lpthread
 
-//nombre de read et write actuels, pour compter quand on arrive à la limite
-int number_of_write = 0;
-int number_of_read = 0;
-
-pthread_t ecrivains[WRITERS];
-pthread_t lecteurs[READERS];
-//création des mutex et sémaphores
-pthread_mutex_t mutex;
-pthread_mutex_t z;
-pthread_mutex_t m_w;
-
-sem_t db;  // accès à la db
-sem_t rsem;
-
-int readcount=0; // nombre de readers en train de lire
-
-int w = 0;	//nombre d'écrivains en train d'écrire
-
-void* writer(void* arg)
-{
+void* writer(void* arg){
     while(number_of_write < 640)
     {
     	//simule la préparation des données à écrire
@@ -67,16 +40,15 @@ void* writer(void* arg)
     printf("number of writes : %d \n",number_of_write);
 }
 
-void* reader(void* arg)
-{
+void* reader(void* arg){
     while(number_of_read < 2560)
     {
         pthread_mutex_lock(&z);
         sem_wait(&rsem);
-        pthread_mutex_lock(&mutex);
+        pthread_mutex_lock(&mutex_RW);
         // section critique
         if(number_of_read >= 2560- readcount){
-         	pthread_mutex_unlock(&mutex);
+         	pthread_mutex_unlock(&mutex_RW);
          	sem_post(&rsem);
         	pthread_mutex_unlock(&z);
         	return NULL;
@@ -87,7 +59,7 @@ void* reader(void* arg)
             sem_wait(&db);
         }
         
-        pthread_mutex_unlock(&mutex);
+        pthread_mutex_unlock(&mutex_RW);
         sem_post(&rsem);
         pthread_mutex_unlock(&z);
         //simule la lecture dans la db
@@ -96,62 +68,66 @@ void* reader(void* arg)
         //printf("le thread %d a fait la %d ème écriture \n",*((int*)arg),number_of_read);
         number_of_read++;
         
-        pthread_mutex_lock(&mutex);
+        pthread_mutex_lock(&mutex_RW);
         // section critique
         readcount--;
         if(readcount==0)
         { // départ du dernier reader
             sem_post(&db);
         }
-        pthread_mutex_unlock(&mutex);
+        pthread_mutex_unlock(&mutex_RW);
         //simule l'utilisation des données
         //printf("process_data()\n");
     }
     printf("number of read : %d \n",number_of_read);
 }
 
-int main ( int argc, char *argv[]){
+int main_RW(int writers, int readers){
+	
+	//nombre de read et write actuels, pour compter quand on arrive à la limite
+	number_of_write = 0;
+	number_of_read = 0;
+
+	pthread_t ecrivains[writers];
+	pthread_t lecteurs[readers];
+
+	readcount=0; // nombre de readers en train de lire
+	w = 0;	//nombre d'écrivains en train d'écrire
+
 	long i;
-	int Wid[WRITERS];
-	int Rid[READERS];
+	int Wid[writers];
+	int Rid[readers];
 	
 	sem_init(&rsem, 0, 1);
 	sem_init(&db, 0, 1);
-	pthread_mutex_init(&mutex, NULL);
+	pthread_mutex_init(&mutex_RW, NULL);
 	pthread_mutex_init(&z, NULL);
 	pthread_mutex_init(&m_w, NULL);
 	
 	
 	srand(getpid());
 	
-	for(i=0; i<WRITERS; i++){
+	for(i=0; i<writers; i++){
 		Wid[i]=i+1;
 	}
-	for(i=0; i<READERS; i++){
+	for(i=0; i<readers; i++){
 		Rid[i]=i+1;
 	}
-	for(i=0; i<WRITERS; i++){
+	for(i=0; i<writers; i++){
 		pthread_create(&ecrivains[i], NULL, writer, (void*)&(Wid[i]));
 	}
-	for(i=0; i<READERS; i++){
+	for(i=0; i<readers; i++){
 		pthread_create(&lecteurs[i], NULL, reader, (void*)&(Rid[i]));
 	}
-	for(i=0; i<WRITERS; i++){
+	for(i=0; i<writers; i++){
 		pthread_join(ecrivains[i], NULL);
 	}
-	for(i=0; i<READERS; i++){
+	for(i=0; i<readers; i++){
 		pthread_join(lecteurs[i], NULL);
 	}
 	sem_destroy(&rsem);
 	sem_destroy(&db);
-	pthread_mutex_destroy(&mutex);
+	pthread_mutex_destroy(&mutex_RW);
 	pthread_mutex_destroy(&z);
 	pthread_mutex_destroy(&m_w);
-
 }
-
-
-
-
-
-
