@@ -4,12 +4,12 @@
 // Productions
 void* producer(void* arg){
 	int item;
-	while(in<1024){
+	while(in<1024+consumerss){
 		item = rand();
 		sem_wait(&empty); //attente d'une place libre
 		pthread_mutex_lock(&mutex_PC);
 		//selection critique
-		if(in==1024){
+		if(in==1024+consumerss){
 			pthread_mutex_unlock(&mutex_PC);
 			return NULL;
 		}
@@ -30,6 +30,10 @@ void* consumer(void* arg){
 		sem_wait(&full); // attente d'une place remplie
 		pthread_mutex_lock(&mutex_PC);
 		// selection critique
+		if(out==1024){
+			pthread_mutex_unlock(&mutex_PC);
+			return NULL;
+		}
 		item = buffer[out%8];
 		//printf("(%d) Consumer %d: remove item %d from %d\n",out+1,*((int*)arg),item,out%8);
 		out++;
@@ -46,6 +50,7 @@ int main_PC(int producers, int consumers){
 	pthread_t cons[consumers];
 	in = 0;
 	out = 0;
+	consumerss = consumers;
 
 	long i;
 	int idP[producers];

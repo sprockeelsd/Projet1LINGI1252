@@ -30,6 +30,7 @@ sem_t full;
 int buffer[8];
 int in;
 int out;
+int consumerss;
 
 // variables globales de P
 pthread_mutex_t *baguette;
