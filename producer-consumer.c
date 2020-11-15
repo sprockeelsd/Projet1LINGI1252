@@ -4,19 +4,21 @@
 // Productions
 void* producer(void* arg){
 	int item;
-	while(in<1024+consumerss){
+	int my_id;
+	while(in<=24){
+		my_id = in;
+		in++;
 		item = rand();
 		sem_wait(&empty); //attente d'une place libre
 		pthread_mutex_lock(&mutex_PC);
 		//selection critique
-		if(in==1024+consumerss){
+		if(my_id>24){
+			sem_post(&empty); // une place libre en plus
 			pthread_mutex_unlock(&mutex_PC);
 			return NULL;
 		}
-		//printf("(%d) Producer %d: add item %d to %d\n",in+1,*((int*)arg),item,in%8);
-		buffer[in%8] = item;
-		in++;
-		//if(in==1024){printf("(%d) Producer %d: add item %d to %d\n",in,*((int*)arg),item,in%8);}
+		//printf("(%d) Producer %d: add item %d to %d\n",my_id,*((int*)arg),item,(my_id-1)%8);
+		buffer[(my_id-1)%8] = item;
 		while(rand()>RAND_MAX/10000);
 		pthread_mutex_unlock(&mutex_PC);
 		sem_post(&full); // une place remplie en plus
@@ -26,31 +28,37 @@ void* producer(void* arg){
 // Consommateur
 void* consumer(void* arg){
 	int item;
-	while(out<1024){
+	int my_id;
+	while(out<=24){
+		my_id = out;
+		out++;
 		sem_wait(&full); // attente d'une place remplie
 		pthread_mutex_lock(&mutex_PC);
 		// selection critique
-		if(out==1024){
+		if(my_id>24){
+			sem_post(&full); // une place remplie en plus
 			pthread_mutex_unlock(&mutex_PC);
 			return NULL;
 		}
-		item = buffer[out%8];
-		//printf("(%d) Consumer %d: remove item %d from %d\n",out+1,*((int*)arg),item,out%8);
-		out++;
+		item = buffer[(my_id-1)%8];
+		buffer[(my_id-1)%8]=0;
+		//printf("(%d) Consumer %d: remove item %d from %d\n",my_id,*((int*)arg),item,(my_id-1)%8);
 		while(rand()>RAND_MAX/10000);
 		pthread_mutex_unlock(&mutex_PC);
 		sem_post(&empty); // une place libre en plus
+		if(my_id==24){
+			sem_post(&full); // une place remplie en plus (fake)
+			
+		}
 	}
-	printf("(%d) Consumer %d: remove item %d from %d\n",out,*((int*)arg),item,out%8);
 }
 	
 int main_PC(int producers, int consumers){
 	
 	pthread_t prod[producers];
 	pthread_t cons[consumers];
-	in = 0;
-	out = 0;
-	consumerss = consumers;
+	in = 1;
+	out = 1;
 
 	long i;
 	int idP[producers];

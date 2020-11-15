@@ -1,5 +1,5 @@
 #include "header.h"
-//gcc header.h reader-writer.c philosophers.c Producer-Consumer.c main.c -o x -lpthread
+//gcc header.h reader-writer.c philosophers.c producer-consumer.c main.c -o x -lpthread
 
 int main(int argc, char const *argv[]){
 	if(strcmp(argv[1], "-PC")==0){

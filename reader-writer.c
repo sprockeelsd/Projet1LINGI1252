@@ -2,10 +2,8 @@
 //gcc -o reader-writer reader-writer.c -lpthread
 
 void* writer(void* arg){
-    while(number_of_write < 640)
-    {
+    while(number_of_write < 640){
     	//simule la préparation des données à écrire
-        //printf("prepare_data()\n");
         pthread_mutex_lock(&m_w);
         w++;
         if(w == 1)
@@ -14,8 +12,6 @@ void* writer(void* arg){
         }
         pthread_mutex_unlock(&m_w);
         sem_wait(&db);
-        //simule l'écriture dans la db
-        //printf("write_database()\n");
         if(number_of_write == 640){
         	sem_post(&db);
         	w--;
@@ -41,8 +37,7 @@ void* writer(void* arg){
 }
 
 void* reader(void* arg){
-    while(number_of_read < 2560)
-    {
+    while(number_of_read < 2560){
         pthread_mutex_lock(&z);
         sem_wait(&rsem);
         pthread_mutex_lock(&mutex_RW);
@@ -54,16 +49,13 @@ void* reader(void* arg){
         	return NULL;
         }
         readcount++;
-        if (readcount==1)
-        { // arrivée du premier reader
+        if (readcount==1){ // arrivée du premier reader
             sem_wait(&db);
         }
         
         pthread_mutex_unlock(&mutex_RW);
         sem_post(&rsem);
         pthread_mutex_unlock(&z);
-        //simule la lecture dans la db
-        //printf("read_database()\n");
         while(rand() > RAND_MAX/10000);
         //printf("le thread %d a fait la %d ème écriture \n",*((int*)arg),number_of_read);
         number_of_read++;
@@ -71,13 +63,10 @@ void* reader(void* arg){
         pthread_mutex_lock(&mutex_RW);
         // section critique
         readcount--;
-        if(readcount==0)
-        { // départ du dernier reader
+        if(readcount==0){ // départ du dernier reader
             sem_post(&db);
         }
         pthread_mutex_unlock(&mutex_RW);
-        //simule l'utilisation des données
-        //printf("process_data()\n");
     }
     printf("number of read : %d \n",number_of_read);
 }
