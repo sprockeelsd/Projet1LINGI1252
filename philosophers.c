@@ -28,7 +28,7 @@ void* philosophe (void* arg){
 		pthread_mutex_unlock(&baguette[right]);
 		//printf("Philosophe [%d] a libéré baguette droite [%d]\n",*id,right);  
 	}
-	printf("philosophe [%d] a mangé %d fois \n",*id,j);
+	//printf("philosophe [%d] a mangé %d fois \n",*id,j);
 	return (NULL);
 }
 

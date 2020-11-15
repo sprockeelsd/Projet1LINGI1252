@@ -33,7 +33,7 @@ void* writer(void* arg){
         }
         pthread_mutex_unlock(&m_w);
     }
-    printf("number of writes : %d \n",number_of_write);
+    //printf("number of writes : %d \n",number_of_write);
 }
 
 void* reader(void* arg){
@@ -68,7 +68,7 @@ void* reader(void* arg){
         }
         pthread_mutex_unlock(&mutex_RW);
     }
-    printf("number of read : %d \n",number_of_read);
+    //printf("number of read : %d \n",number_of_read);
 }
 
 int main_RW(int writers, int readers){
