@@ -14,4 +14,5 @@ do
 		output=$(((/usr/bin/time -f %e make -j ${n} -s 2>&1) | cut -d\) -f2)
 		echo ${n},${output:1}
 	done
-done
+done 
+#./script.sh > data.csv
