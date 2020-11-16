@@ -2,8 +2,8 @@
 
 CC = gcc
 
-all: run clean
-
+all:	header.h reader-writer.c philosophers.c producer-consumer.c main.c -lpthread
+	$(CC) header.h reader-writer.c philosophers.c producer-consumer.c main.c -o x -lpthread
 run: header.h mainFact.c multithreading.c wheelFactorization.c queuing.c
 	$(CC) header.h mainFact.c multithreading.c wheelFactorization.c queuing.c -lpthread -lm -std=c99 -o fact
 
