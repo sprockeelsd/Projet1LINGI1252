@@ -1,26 +1,19 @@
 .PHONY: run clean all
+.DEFAULT_GOAL := run
 
 CC = gcc
+OBJ = header.h reader-writer.c philosophers.c producer-consumer.c main.c -lpthread
 
-all:	header.h reader-writer.c philosophers.c producer-consumer.c main.c -lpthread
-	$(CC) header.h reader-writer.c philosophers.c producer-consumer.c main.c -o main -lpthread
-	
-philosophers: header.h reader-writer.c philosophers.c producer-consumer.c main.c -lpthread
-	$(CC) -o philosphers header.h philosophers.c -lpthread
+all: run perf
 
-run: header.h mainFact.c multithreading.c wheelFactorization.c queuing.c
-	$(CC) header.h mainFact.c multithreading.c wheelFactorization.c queuing.c -lpthread -lm -std=c99 -o fact
+run: $(OBJ)
+	$(CC) $^ -o main -lpthread
 
-performance_test: performance_test.c header.h wheelFactorization.c queuing.c multithreading.c
-	$(CC) performance_test.c header.h wheelFactorization.c queuing.c multithreading.c -lpthread -o performance_test
-
-run_perf: performance_test.c header.h wheelFactorization.c queuing.c multithreading.c performance_test
-	rm -f data.csv
+perf: $(OBJ)
+	rm -f datas.csv
+	bash script.sh > datas.csv
 	python3 python_graphs.py
-	./performance_test
 
 clean:
 	rm -f main
-	rm -f philosophers
-	rm -f reader-writer
-	rm -f producer-consumer
+	rm -f data.csv

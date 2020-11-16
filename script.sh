@@ -1,8 +1,6 @@
-#!/bin/bash
+#!/usr/bin/bash
 RUNS=5
-#NTHREAD=8
-NCORE=$(((cat /proc/cpuinfo) | grep processor) | wc -l)
-NTHREAD=$NCORE*2
+let NTHREAD=$(nproc)*2
 
 echo "nb_coeur,temps"
 
@@ -11,8 +9,7 @@ do
 	for ((n=1;n<=$NTHREAD;n++))
 	do
 		make clean -s 2> /dev/null
-		output=$(((/usr/bin/time -f %e make -j ${n} -s 2>&1) | cut -d\) -f2)
-		echo ${n},${output:1}
+		output=$((/usr/bin/time -f %e make -j ${n} -s 2>&1)| cut -d\) -f2)
+		echo ${n},${output}+0.01
 	done
-done 
-#./script.sh > data.csv
+done
