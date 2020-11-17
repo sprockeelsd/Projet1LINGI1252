@@ -34,6 +34,10 @@ void* philosophe (void* arg){
 
 int main_P(int philosophes){
 	
+	if(philosophes==1){
+		return (EXIT_SUCCESS);
+	}
+	
 	philosophess=philosophes;
 	pthread_t phil[philosophes];
 	baguette = malloc(philosophes*sizeof(pthread_mutex_t));

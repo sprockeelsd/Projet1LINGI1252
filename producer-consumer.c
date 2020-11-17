@@ -55,6 +55,10 @@ void* consumer(void* arg){
 	
 int main_PC(int producers, int consumers){
 	
+	if(producers==0 || consumers==0){
+		return(EXIT_SUCCESS);
+	}
+	
 	pthread_t prod[producers];
 	pthread_t cons[consumers];
 	in = 1;

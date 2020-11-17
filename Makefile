@@ -1,4 +1,4 @@
-.PHONY: run clean all
+.PHONY: run clean perf all
 .DEFAULT_GOAL := run
 
 CC = gcc
@@ -11,9 +11,9 @@ run: $(OBJ)
 
 perf: $(OBJ)
 	rm -f datas.csv
+	touch datas.csv
 	bash script.sh > datas.csv
-	python3 python_graphs.py
+	python3 graphs.py
 
 clean:
 	rm -f main
-	rm -f data.csv
