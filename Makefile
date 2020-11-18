@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := run
 
 CC = gcc
-OBJ = header.h reader-writer.c philosophers.c producer-consumer.c main.c -lpthread
+OBJ = header.h reader-writer.c philosophers.c producer-consumer.c main.c test-set.c -lpthread
 
 all: run perf1 perf2
 
@@ -20,7 +20,7 @@ perf2: $(OBJ)
 	bash perf_partie2.sh > datas.csv
 	python3 verrou.py
 	rm -f datas.csv
-
+	
 clean:
 	rm -f main
 	#rm -f datas.csv

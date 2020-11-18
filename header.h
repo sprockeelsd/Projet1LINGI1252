@@ -35,6 +35,9 @@ int out;
 pthread_mutex_t *baguette;
 int philosophess;
 
+//variables globales de TS
+long lockk;
+
 //Fonctions RW
 void* writer(void* arg);
 void* reader(void* arg);
@@ -48,5 +51,10 @@ int main_PC(int producers, int consumers);
 //Fonctions P
 void* philosophe ( void* arg );
 int main_P(int philosophes);
+
+//Fonctions TS
+int lock(long lock);
+int unlock(long lock);
+int main_TS();
 
 #endif
