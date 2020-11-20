@@ -11,8 +11,11 @@ int main(int argc, char const *argv[]){
 	else if(strcmp(argv[1], "-P")==0){
 		main_P(atoi(argv[2]));
 	}
-	else if(strcmp(argv[1], "-TSP")==0){
-		main_TSP(atoi(argv[2]));
+	else if(strcmp(argv[1], "-TS")==0){
+		main_TS(atoi(argv[2]));
+	}
+	else if(strcmp(argv[1], "-TTS")==0){
+		main_TTS(atoi(argv[2]));
 	}
 	else{printf("Wrong argument\n");}
 }

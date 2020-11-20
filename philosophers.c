@@ -10,23 +10,16 @@ void* philosophe (void* arg){
 		//printf("Philosophe [%d] pense\n",*id);
 		if(left<right){
 			pthread_mutex_lock(&baguette[left]);
-			//printf("Philosophe [%d] possède baguette gauche [%d]\n",*id,left);
 			pthread_mutex_lock(&baguette[right]);
-			//printf("Philosophe [%d] possède baguette droite [%d]\n",*id,right);
 		}
 		else{
 			pthread_mutex_lock(&baguette[right]);
-			//printf("Philosophe [%d] possède baguette droite [%d]\n",*id,right);
 			pthread_mutex_lock(&baguette[left]);
-			//printf("Philosophe [%d] possède baguette gauche [%d]\n",*id,left);
 		}
 		//printf("Philosophe [%d] mange et on est à la %d ème itération \n",*id,j);
-		
 		j++;   
 		pthread_mutex_unlock(&baguette[left]);
-		//printf("Philosophe [%d] a libéré baguette gauche [%d]\n",*id,left);
 		pthread_mutex_unlock(&baguette[right]);
-		//printf("Philosophe [%d] a libéré baguette droite [%d]\n",*id,right);  
 	}
 	//printf("philosophe [%d] a mangé %d fois \n",*id,j);
 	return (NULL);
@@ -34,23 +27,22 @@ void* philosophe (void* arg){
 
 int main_P(int philosophes){
 	
-	if(philosophes==1){
-		return (EXIT_SUCCESS);
-	}
-	
 	philosophess=philosophes;
+	if(philosophes==1){
+		philosophess=2;
+	}
 	pthread_t phil[philosophes];
-	baguette = malloc(philosophes*sizeof(pthread_mutex_t));
-	//faire en sorte que la fonction prenne le nombre de philosophes en argument
+	baguette = malloc(philosophess*sizeof(pthread_mutex_t));
+
 	long i;
 	int id[philosophes];
 
 	srand(getpid());
 
-	for (i = 0; i < philosophes; i++)
+	for (i = 0; i < philosophess; i++)
      		id[i]=i;
 
-   	for (i = 0; i < philosophes; i++)
+   	for (i = 0; i < philosophess; i++)
       		pthread_mutex_init(&baguette[i], NULL);
 
    	for (i = 0; i < philosophes; i++)

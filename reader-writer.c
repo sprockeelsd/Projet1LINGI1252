@@ -73,6 +73,10 @@ void* reader(void* arg){
 
 int main_RW(int writers, int readers){
 	
+	if(writers==0 || readers==0){
+		return(EXIT_SUCCESS);
+	}
+	
 	//nombre de read et write actuels, pour compter quand on arrive à la limite
 	number_of_write = 0;
 	number_of_read = 0;

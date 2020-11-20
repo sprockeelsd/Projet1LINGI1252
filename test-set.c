@@ -1,43 +1,36 @@
 #include "header.h"
 
-void* lock(int *arg){
-	int y = 1;
-	int n = 0;
-	while(y!=0 && n < 5){
-		asm (	"movl $1, %%eax;"	//mets 1 dans eax
-  			"xchgl %%eax, (%1);"	//echange lock et eax	
-       		"movl %%eax, %0;"	//mets la valeur de eax en sortie
-    			:"=r"(y)  /* y is output operand */
-    			:"r"(arg)   /* x is input operand */
-   			:"%eax"); /* %eax is clobbered register */
-   			n++;
+void *test_TS(void *arg){
+	int j = 0;
+	while(j < 6400/nbthread_TS) {
+		j++;
+		lock_TS(mutex_TS);
+		while(rand()>RAND_MAX/10000);
+		unlock(mutex_TS);
 	}
-	//printf("lock valait 0, maintenant lock vaut %d et y vaut %d \n",*arg,y);
+	//printf("%d boucle numéro %d\n",*((int*)arg),j);
+}
+
+int main_TS(int threads){
+	//initialisation du lock
+	nbthread_TS = threads;
+	mutex_TS = init();
 	
+	srand(getpid());
+	
+	pthread_t thread[threads];
+	
+	int id[threads];
+	
+	for(int i=0; i<threads; i++){
+		id[i]=i+1;
+	}
+	for(int i=0; i<threads; i++){
+		pthread_create(&thread[i], NULL, test_TS, (void*)&(id[i]));
+	}
+
+	for(int i=0; i<threads; i++){
+		pthread_join(thread[i], NULL);
+	}
+	destroy(mutex_TS);		
 }
-
-void* unlock(int *arg){
-	asm (	"movl $0, %%eax;"	//mets 0 dans eax
-  		"xchgl %%eax, (%0);"	//echange lock et eax	
-  		:			//pas d'output
-    		:"r"(arg)   /* x is input operand */
-   		:"%eax"); /* %eax is clobbered register */
-}
-
-int* init(){
-	int *arg = malloc(sizeof(int));
-	*arg = 0;
-	return arg;
-}
-
-void* destroy(int* arg){
-	free(arg);
-}
-
-
-
-
-
-
-
-

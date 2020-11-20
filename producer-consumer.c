@@ -5,14 +5,14 @@
 void* producer(void* arg){
 	int item;
 	int my_id;
-	while(in<=24){
+	while(in<=1024){
 		my_id = in;
 		in++;
 		item = rand();
 		sem_wait(&empty); //attente d'une place libre
 		pthread_mutex_lock(&mutex_PC);
 		//selection critique
-		if(my_id>24){
+		if(my_id>1024){
 			sem_post(&empty); // une place libre en plus
 			pthread_mutex_unlock(&mutex_PC);
 			return NULL;
@@ -29,13 +29,13 @@ void* producer(void* arg){
 void* consumer(void* arg){
 	int item;
 	int my_id;
-	while(out<=24){
+	while(out<=1024){
 		my_id = out;
 		out++;
 		sem_wait(&full); // attente d'une place remplie
 		pthread_mutex_lock(&mutex_PC);
 		// selection critique
-		if(my_id>24){
+		if(my_id>1024){
 			sem_post(&full); // une place remplie en plus
 			pthread_mutex_unlock(&mutex_PC);
 			return NULL;
@@ -46,7 +46,7 @@ void* consumer(void* arg){
 		while(rand()>RAND_MAX/10000);
 		pthread_mutex_unlock(&mutex_PC);
 		sem_post(&empty); // une place libre en plus
-		if(my_id==24){
+		if(my_id==1024){
 			sem_post(&full); // une place remplie en plus (fake)
 			
 		}

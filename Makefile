@@ -1,12 +1,12 @@
-.PHONY: run clean perf1 all
-.DEFAULT_GOAL := run
+.PHONY: clean perf1 all
+.DEFAULT_GOAL := main
 
 CC = gcc
-OBJ = header.h reader-writer.c philosophers.c producer-consumer.c test-set.c test-set-perf.c main.c 
+OBJ = header.h reader-writer.c philosophers.c producer-consumer.c verrou.c test-set.c test-test-set.c main.c 
 
 all: run perf1 perf2
 
-run: $(OBJ)
+main: $(OBJ)
 	$(CC) $^ -o main -lpthread
 
 perf1: main
@@ -18,9 +18,8 @@ perf1: main
 perf2: main
 	touch datas.csv
 	bash perf_partie2.sh > datas.csv
-	python3 verrou.py
+	python3 graphs.py
 	rm -f datas.csv
 	
 clean:
 	rm -f main
-	#rm -f datas.csv

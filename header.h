@@ -36,10 +36,13 @@ pthread_mutex_t *baguette;
 int philosophess;
 
 //variables globales de TS
+int* mutex_TS;
+int nbthread_TS;
 
-//variables globales de TSP
-int* mutex_TSP;
-int nbthread_TSP;
+//variables globales de TTS
+int* mutex_TTS;
+int nbthread_TTS;
+
 //Fonctions RW
 void* writer(void* arg);
 void* reader(void* arg);
@@ -54,14 +57,20 @@ int main_PC(int producers, int consumers);
 void* philosophe ( void* arg );
 int main_P(int philosophes);
 
-//Fonctions TS
-void* lock(int *arg);
+//Fonctions verrou
+void* lock_TS(int *arg);
 void* unlock(int *arg);
+void* lock_TTS(int *arg);
 int* init();
 void* destroy(int *arg);
 
-//Fonctions TSP
-void *test(void *arg);
-int main_TSP(int n);
+//Fonctions TS
+void *test_TS(void *arg);
+int main_TS(int n);
+
+//Fonctions TTS
+void *test_TTS(void *arg);
+int main_TTS(int n);
+
 
 #endif
