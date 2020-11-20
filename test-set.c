@@ -10,11 +10,9 @@ void* lock(int *arg){
     			:"=r"(y)  /* y is output operand */
     			:"r"(arg)   /* x is input operand */
    			:"%eax"); /* %eax is clobbered register */
-   			printf("%d\n",y);
-   			printf("arg = %d\n",*arg);
    			n++;
 	}
-	printf("lock valait 0, maintenant lock vaut %d et y vaut %d \n",*arg,y);
+	//printf("lock valait 0, maintenant lock vaut %d et y vaut %d \n",*arg,y);
 	
 }
 
@@ -26,9 +24,10 @@ void* unlock(int *arg){
    		:"%eax"); /* %eax is clobbered register */
 }
 
-void* init_TS(int *arg){
-	arg = malloc(sizeof(int));
+int* init(){
+	int *arg = malloc(sizeof(int));
 	*arg = 0;
+	return arg;
 }
 
 void* destroy(int* arg){

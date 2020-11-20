@@ -39,7 +39,7 @@ int philosophess;
 
 //variables globales de TSP
 int* mutex_TSP;
-
+int nbthread_TSP;
 //Fonctions RW
 void* writer(void* arg);
 void* reader(void* arg);
@@ -57,7 +57,7 @@ int main_P(int philosophes);
 //Fonctions TS
 void* lock(int *arg);
 void* unlock(int *arg);
-void* init_TS(int *arg);
+int* init();
 void* destroy(int *arg);
 
 //Fonctions TSP

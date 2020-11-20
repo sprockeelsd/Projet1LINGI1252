@@ -2,21 +2,20 @@
 
 void *test(void *arg){
 	int j = 0;
-	while(j < 10) {
+	while(j < 6400/nbthread_TSP) {
 		j++;
 		lock(mutex_TSP);
 		while(rand()>RAND_MAX/10000);
-		printf("%d boucle numéro %d\n",*((int*)arg),j);
 		unlock(mutex_TSP);
 	}
-	return (NULL);
+	printf("%d boucle numéro %d\n",*((int*)arg),j);
 }
 
 
 int main_TSP(int n){
 	//initialisation du lock
-	
-	init_TS(mutex_TSP);
+	nbthread_TSP = n;
+	mutex_TSP = init();
 	
 	srand(getpid());
 	
