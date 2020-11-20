@@ -36,7 +36,9 @@ pthread_mutex_t *baguette;
 int philosophess;
 
 //variables globales de TS
-long lockk;
+
+//variables globales de TSP
+int* mutex_TSP;
 
 //Fonctions RW
 void* writer(void* arg);
@@ -53,8 +55,13 @@ void* philosophe ( void* arg );
 int main_P(int philosophes);
 
 //Fonctions TS
-int lock(long lock);
-int unlock(long lock);
-int main_TS();
+void* lock(int *arg);
+void* unlock(int *arg);
+void* init_TS(int *arg);
+void* destroy(int *arg);
+
+//Fonctions TSP
+void *test(void *arg);
+int main_TSP(int n);
 
 #endif
