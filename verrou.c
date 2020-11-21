@@ -22,15 +22,31 @@ void* lock_TTS(int *arg){
     			:"=r"(y)  /* y is output operand */
     			:"r"(arg)   /* x is input operand */
    			:"%eax"); /* %eax is clobbered register */
-   			while(y!=0){
-   				asm (	"movl (%1), %0;"	//mets lock en sortie
-	    			:"=r"(y)  /* y is output operand */
-	    			:"r"(arg));   /* x is input operand */
-   			}
+   			if(y==0){return NULL;}
+   			while(*arg!=0);
 	}
 	//printf("lock valait 0, maintenant lock vaut %d et y vaut %d \n",*arg,y);
 }
 
+void* lock_BTTS(int *arg){
+	int y = 1;
+	int v = vmin;
+	int wait;
+	int x;
+	while(y!=0){
+		asm (	"movl $1, %%eax;"	//mets 1 dans eax
+  			"xchgl %%eax, (%1);"	//echange lock et eax	
+       		"movl %%eax, %0;"	//mets la valeur de eax en sortie
+    			:"=r"(y)  /* y is output operand */
+    			:"r"(arg)   /* x is input operand */
+   			:"%eax"); /* %eax is clobbered register */
+   			if(y==0){return NULL;}
+   			v = vmin;
+   			while(v*rand()>RAND_MAX/10000)if(v*2<vmax) v*=2;
+   			while(*arg!=0);
+	}
+	//printf("lock valait 0, maintenant lock vaut %d et y vaut %d \n",*arg,y);
+}
 
 void* unlock(int *arg){
 	asm (	"movl $0, %%eax;"	//mets 0 dans eax
@@ -48,4 +64,9 @@ int* init(){
 
 void* destroy(int* arg){
 	free(arg);
+}
+
+void* init_BTTS(int min, int max){
+	vmin = min;
+	vmax = max;
 }

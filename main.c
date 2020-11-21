@@ -17,5 +17,8 @@ int main(int argc, char const *argv[]){
 	else if(strcmp(argv[1], "-TTS")==0){
 		main_TTS(atoi(argv[2]));
 	}
+	else if(strcmp(argv[1], "-BTTS")==0){
+		main_BTTS(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]));
+	}
 	else{printf("Wrong argument\n");}
 }

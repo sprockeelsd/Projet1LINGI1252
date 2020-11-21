@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := main
 
 CC = gcc
-OBJ = header.h reader-writer.c philosophers.c producer-consumer.c verrou.c test-set.c test-test-set.c main.c 
+OBJ = header.h reader-writer.c philosophers.c producer-consumer.c verrou.c sem.c test-set.c test-test-set.c backoff-test-test-set.c main.c 
 
 all: run perf1 perf2
 
@@ -19,6 +19,12 @@ perf2: main
 	touch datas.csv
 	bash perf_partie2.sh > datas.csv
 	python3 graphs.py
+	rm -f datas.csv
+
+perfb: main
+	touch datas.csv
+	bash backoff.sh > datas.csv
+	python3 python3 backoffs.py
 	rm -f datas.csv
 	
 clean:

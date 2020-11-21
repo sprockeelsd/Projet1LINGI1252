@@ -28,7 +28,6 @@ int main_TTS(int threads){
 	for(int i=0; i<threads; i++){
 		pthread_create(&thread[i], NULL, test_TTS, (void*)&(id[i]));
 	}
-
 	for(int i=0; i<threads; i++){
 		pthread_join(thread[i], NULL);
 	}
