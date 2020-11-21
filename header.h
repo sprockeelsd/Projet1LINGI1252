@@ -52,10 +52,11 @@ int vmax;
 //variables globales de sem
 int nmax;
 int ncurrent;
-struct def{
-	int nmax;
-	int ncurrent;
-	void* queue;
+typedef struct def{
+	int current;
+	int max;
+	int **mutex;
+	int* sem_mutex;
 }semaphore;
 
 //Fonctions RW
@@ -94,8 +95,8 @@ int main_BTTS(int n, int min, int max);
 void* init_BTTS(int min, int max);
 
 //Fonctions sem
-void* post(int *arg);
-void* wait(int *arg);
-int* init_S(int start, int max);
-void* destroy_S(int* arg);
+void* post(semaphore *arg);
+void* wait(semaphore *arg);
+semaphore* init_S(int maxi);
+void* destroy_S(semaphore* arg);
 #endif
