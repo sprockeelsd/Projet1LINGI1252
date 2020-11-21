@@ -14,7 +14,7 @@ void* wait(int *arg){
 	//if start==max-1 --> unblock
 }
 
-int* init(int start, int max){
+int* init_S(int start, int max){
 	int *arg = malloc(sizeof(int));
 	*arg = 0;
 	//initiate local int start
@@ -22,6 +22,6 @@ int* init(int start, int max){
 	return arg;
 }
 
-void* destroy(int* arg){
+void* destroy_S(int* arg){
 	free(arg);
 }

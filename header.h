@@ -87,6 +87,6 @@ void* init_BTTS(int min, int max);
 //Fonctions sem
 void* post(int *arg);
 void* wait(int *arg);
-int* init(int start, int max);
-void* destroy(int* arg);
+int* init_S(int start, int max);
+void* destroy_S(int* arg);
 #endif
