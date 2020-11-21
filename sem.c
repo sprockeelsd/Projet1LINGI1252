@@ -5,6 +5,8 @@ void* post(int *arg){
 	//start++
 	//if start==max --> block
 	//if start==1 --> unblock
+	
+	//
 }
 
 void* wait(int *arg){
@@ -15,10 +17,13 @@ void* wait(int *arg){
 }
 
 int* init_S(int start, int max){
-	int *arg = malloc(sizeof(int));
-	*arg = 0;
+	semaphore *arg = malloc(sizeof(semaphore));
 	//initiate local int start
+	*arg->ncurrent = start;
 	//initiate local int max
+	*arg->nmax = max;
+	//initiate queue
+	*arg->queue = malloc(sizeof(void*));
 	return arg;
 }
 

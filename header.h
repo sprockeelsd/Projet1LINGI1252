@@ -49,6 +49,15 @@ int nbthread_BTTS;
 int vmin;
 int vmax;
 
+//variables globales de sem
+int nmax;
+int ncurrent;
+struct def{
+	int nmax;
+	int ncurrent;
+	void* queue;
+}semaphore;
+
 //Fonctions RW
 void* writer(void* arg);
 void* reader(void* arg);
