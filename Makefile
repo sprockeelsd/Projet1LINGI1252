@@ -19,24 +19,28 @@ perf1: main
 	bash perf_partie1.sh > datas.csv
 	python3 graphs.py
 	rm -f datas.csv
+	rm -f main
 	
 perf2: main
 	touch datas.csv
 	bash perf_partie2.sh > datas.csv
 	python3 graphs.py
 	rm -f datas.csv
+	rm -f main
 
 perf1-2: main
 	touch datas.csv
 	bash perf_comp.sh > datas.csv
 	python3 graphs2.py
 	rm -f datas.csv
+	rm -f main
 
 perfb: main
 	touch datas.csv
 	bash backoff.sh > datas.csv
 	python3 backoffs.py
 	rm -f datas.csv
+	rm -f main
 	
 clean:
 	rm -f main

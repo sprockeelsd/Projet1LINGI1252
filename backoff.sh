@@ -3,7 +3,6 @@ RUNS=10000
 declare -i min
 declare -i max
 
-make
 echo "Vmin,BTTS_1,BTTS_2,BTTS_3,BTTS_4,BTTS_5,BTTS_6,BTTS_7"
 
 for ((i=0;i<$RUNS;i+=100))
