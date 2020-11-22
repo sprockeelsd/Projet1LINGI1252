@@ -9,6 +9,11 @@ all: run perf1 perf2
 main: $(OBJ)
 	$(CC) $^ -o main -lpthread
 
+a.out: $(OBJ)
+	$(CC) -g $^ -lpthread
+	gdb a.out
+	
+
 perf1: main
 	touch datas.csv
 	bash perf_partie1.sh > datas.csv

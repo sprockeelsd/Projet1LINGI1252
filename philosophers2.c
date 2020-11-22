@@ -46,15 +46,14 @@ int main_P2(int philosophes){
    		baguette2[i] = init();
    	
    	for (i = 0; i < philosophes; i++)
-     		pthread_create(&phil[i], NULL, philosophe2, (void*)&(id[i]) );
+     		pthread_create(&phil[i], NULL, philosophe2, (void*)&(id[i]));
 
    	for (i = 0; i < philosophes; i++)
       		pthread_join(phil[i], NULL);
       	
-	for (i = 0; i < philosophess; i++)
-		printf("CHECK 1 -> %ls\n",baguette2[i]);
+	for (i = 0; i < philosophess; i++){
 		destroy(baguette2[i]);
-	printf("CHECK 2\n");
+	}
 	free(baguette2);
    	return (EXIT_SUCCESS);
 }
