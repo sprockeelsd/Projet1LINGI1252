@@ -53,6 +53,7 @@ int main_P(int philosophes){
 	
 	for (i = 0; i < philosophes; i++)
       		pthread_mutex_destroy(&baguette[i]);
+      	
 	free(baguette);
    	return (EXIT_SUCCESS);
 }

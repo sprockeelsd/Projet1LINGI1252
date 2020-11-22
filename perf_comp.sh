@@ -4,7 +4,7 @@ let NTHREAD=$(nproc)*2
 declare -i one
 declare -i two
 
-echo "N° of threads,temps_CC,Philosophers,Producer/Consumer,Reader/Writer,N1,N2"
+echo "N° of threads,temps_CC,Philosophers,Producer/Consumer,Reader/Writer,Philosophers2,Producer/Consumer2,Reader/Writer2,N1,N2"
 
 for ((i=0;i<$RUNS;i++))
 do

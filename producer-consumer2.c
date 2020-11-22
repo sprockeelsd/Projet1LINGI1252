@@ -5,7 +5,6 @@
 void* producer2(void* arg){
 	int item;
 	int my_id;
-	empty2 = (semaphore*)arg;
 	while(in<=1024){
 		my_id = in;
 		in++;
@@ -14,14 +13,14 @@ void* producer2(void* arg){
 		lock_TS(mutex_PC2);
 		//selection critique
 		if(my_id>1024){
-			post(empty2); // une place libre en plus
+			post(empty2); // une place libre en plus // b producer-consumer2.c:17
 			unlock(mutex_PC2);
 			return NULL;
 		}
 		buffer[(my_id-1)%8] = item;
 		while(rand()>RAND_MAX/10000);
 		unlock(mutex_PC2);
-		post(full2); // une place remplie en plus
+		post(full2); // une place remplie en plus // b producer-consumer2.c:24
 	}
 }
 
@@ -29,7 +28,6 @@ void* producer2(void* arg){
 void* consumer2(void* arg){
 	int item;
 	int my_id;
-	full2 = (semaphore*)arg;
 	while(out<=1024){
 		my_id = out;
 		out++;
@@ -37,7 +35,7 @@ void* consumer2(void* arg){
 		lock_TS(mutex_PC2);
 		// selection critique
 		if(my_id>1024){
-			post(full2); // une place remplie en plus
+			post(full2); // une place remplie en plus // b producer-consumer2.c:40
 			unlock(mutex_PC2);
 			return NULL;
 		}
@@ -45,9 +43,9 @@ void* consumer2(void* arg){
 		buffer[(my_id-1)%8]=0;
 		while(rand()>RAND_MAX/10000);
 		unlock(mutex_PC2);
-		post(empty2); // une place libre en plus
+		post(empty2); // une place libre en plus // b producer-consumer2.c:48
 		if(my_id==1024){
-			post(full2); // une place remplie en plus (fake)
+			post(full2); // une place remplie en plus (fake) // b producer-consumer2.c:50
 			
 		}
 	}
@@ -69,8 +67,8 @@ int main_PC2(int producers, int consumers){
 	int idC[consumers];
 
 	mutex_PC2 = init();
-	semaphore* empty2 = init_S(8, 8);
-	semaphore* full2 = init_S(0, 8);
+	empty2 = init_S(8, 8);
+	full2 = init_S(0, 8);
 
 	srand(getpid());
 	
@@ -81,10 +79,10 @@ int main_PC2(int producers, int consumers){
 		idC[i]=i+1;
 	}
 	for(i=0; i<producers; i++){
-		pthread_create(&prod[i], NULL, producer2, (void*)empty2);//&(idP[i])
+		pthread_create(&prod[i], NULL, producer2, (void*)&(idP[i]));//&(idP[i])
 	}
 	for(i=0; i<consumers; i++){
-		pthread_create(&cons[i], NULL, consumer2, (void*)full2);//&(idC[i])
+		pthread_create(&cons[i], NULL, consumer2, (void*)&(idC[i]));//&(idC[i])
 	}
 	for(i=0; i<producers; i++){
 		pthread_join(prod[i], NULL);
@@ -92,7 +90,7 @@ int main_PC2(int producers, int consumers){
 	for(i=0; i<consumers; i++){
 		pthread_join(cons[i], NULL);
 	}
-	destroy(mutex_PC2);
+	destroy(mutex_PC2); // b producer-consumer2.c:95
 	destroy_S(empty2);
 	destroy_S(full2);
 	return(EXIT_SUCCESS);

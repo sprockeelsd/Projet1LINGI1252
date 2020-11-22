@@ -26,6 +26,12 @@ perf2: main
 	python3 graphs.py
 	rm -f datas.csv
 
+perf1-2: main
+	touch datas.csv
+	bash perf_comp.sh > datas.csv
+	python3 graphs2.py
+	rm -f datas.csv
+
 perfb: main
 	touch datas.csv
 	bash backoff.sh > datas.csv

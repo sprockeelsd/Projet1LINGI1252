@@ -28,8 +28,8 @@ int vmax;
 int nmax;
 int ncurrent;
 typedef struct def{
-	int *current;
-	int *max;
+	int current;
+	int max;
 	int *mutexW;
 	int *mutexP;
 	int *protection;
@@ -48,6 +48,7 @@ sem_t db;  // accès à la db
 sem_t rsem;
 semaphore* db2;
 semaphore* rsem2;
+semaphore* rw[2];
 int readcount; // nombre de readers en train de lire
 int w;	//nombre d'écrivains en train d'écrire
 
@@ -58,6 +59,7 @@ sem_t empty;
 sem_t full;
 semaphore* empty2;
 semaphore* full2;
+semaphore* pc[2];
 int buffer[8];
 int in;
 int out;

@@ -32,7 +32,7 @@ int main_P2(int philosophes){
 		philosophess=2;
 	}
 	pthread_t phil[philosophes];
-	baguette2 = malloc(philosophess*sizeof(int));
+	baguette2 = malloc(philosophess*sizeof(int*));
 	
 	long i;
 	int id[philosophes];
@@ -52,7 +52,7 @@ int main_P2(int philosophes){
       		pthread_join(phil[i], NULL);
       	
 	for (i = 0; i < philosophess; i++){
-		destroy(baguette2[i]);
+		destroy(baguette2[i]); //b philosophers2.c:55
 	}
 	free(baguette2);
    	return (EXIT_SUCCESS);
