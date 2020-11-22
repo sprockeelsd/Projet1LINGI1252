@@ -2,7 +2,7 @@
 .DEFAULT_GOAL := main
 
 CC = gcc
-OBJ = header.h reader-writer.c philosophers.c producer-consumer.c verrou.c sem.c test-set.c test-test-set.c backoff-test-test-set.c main.c 
+OBJ = header.h reader-writer.c philosophers.c producer-consumer.c reader-writer2.c philosophers2.c producer-consumer2.c verrou.c sem.c test-set.c test-test-set.c backoff-test-test-set.c main.c 
 
 all: run perf1 perf2
 

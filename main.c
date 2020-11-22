@@ -11,6 +11,15 @@ int main(int argc, char const *argv[]){
 	else if(strcmp(argv[1], "-P")==0){
 		main_P(atoi(argv[2]));
 	}
+	else if(strcmp(argv[1], "-PC2")==0){
+		main_PC2(atoi(argv[2]),atoi(argv[3]));
+	}
+	else if(strcmp(argv[1], "-RW2")==0){
+		main_RW2(atoi(argv[2]),atoi(argv[3]));
+	}
+	else if(strcmp(argv[1], "-P2")==0){
+		main_P2(atoi(argv[2]));
+	}
 	else if(strcmp(argv[1], "-TS")==0){
 		main_TS(atoi(argv[2]));
 	}

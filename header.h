@@ -10,31 +10,6 @@
 #include <stdbool.h>
 #include "header.h"
 
-#define N 10 // places dans le buffer
-
-// variables globales de RW
-int number_of_write;
-int number_of_read;
-pthread_mutex_t mutex_RW;
-pthread_mutex_t z;
-pthread_mutex_t m_w;
-sem_t db;  // accès à la db
-sem_t rsem;
-int readcount; // nombre de readers en train de lire
-int w;	//nombre d'écrivains en train d'écrire
-
-// variables globales de PC
-pthread_mutex_t mutex_PC;
-sem_t empty;
-sem_t full;
-int buffer[8];
-int in;
-int out;
-
-// variables globales de P
-pthread_mutex_t *baguette;
-int philosophess;
-
 //variables globales de TS
 int* mutex_TS;
 int nbthread_TS;
@@ -55,9 +30,42 @@ int ncurrent;
 typedef struct def{
 	int current;
 	int max;
+	int index;
 	int **mutex;
 	int* sem_mutex;
 }semaphore;
+
+// variables globales de RW & RW2
+int number_of_write;
+int number_of_read;
+pthread_mutex_t mutex_RW;
+pthread_mutex_t z;
+pthread_mutex_t m_w;
+int* mutex_RW2;
+int* z2;
+int* m_w2;
+sem_t db;  // accès à la db
+sem_t rsem;
+semaphore* db2;
+semaphore* rsem2;
+int readcount; // nombre de readers en train de lire
+int w;	//nombre d'écrivains en train d'écrire
+
+// variables globales de PC & PC2
+pthread_mutex_t mutex_PC;
+int* mutex_PC2;
+sem_t empty;
+sem_t full;
+semaphore* empty2;
+semaphore* full2;
+int buffer[8];
+int in;
+int out;
+
+// variables globales de P & P2
+pthread_mutex_t *baguette;
+int **baguette2;
+int philosophess;
 
 //Fonctions RW
 void* writer(void* arg);
@@ -70,8 +78,22 @@ void* consumer(void* arg);
 int main_PC(int producers, int consumers);
 
 //Fonctions P
-void* philosophe ( void* arg );
+void* philosophe(void* arg);
 int main_P(int philosophes);
+
+//Fonctions RW2
+void* writer2(void* arg);
+void* reader2(void* arg);
+int main_RW2(int writers, int readers);
+
+//Fonctions PC2
+void* producer2(void* arg);
+void* consumer2(void* arg);
+int main_PC2(int producers, int consumers);
+
+//Fonctions P2
+void* philosophe2(void* arg);
+int main_P2(int philosophes);
 
 //Fonctions verrou
 void* lock_TS(int *arg);
@@ -97,6 +119,6 @@ void* init_BTTS(int min, int max);
 //Fonctions sem
 void* post(semaphore *arg);
 void* wait(semaphore *arg);
-semaphore* init_S(int maxi);
+semaphore* init_S(int start, int maxi);
 void* destroy_S(semaphore* arg);
 #endif

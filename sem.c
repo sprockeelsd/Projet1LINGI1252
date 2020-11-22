@@ -1,29 +1,34 @@
 #include "header.h"
 
 void* post(semaphore *arg){
-	if((*arg).current>0){
-		//dequeue??
-		lock_TS((*arg).mutex[(*arg).current]);
-	}
+	if((*arg).current>=(*arg).max || (*arg).current<0) printf("ERROR 2\n");//pour tester
 	else{
-		unlock((*arg).mutex[(*arg).current]);
+		if(*((*arg).mutex[(*arg).index])==0) printf("ERROR 3\n");//pour tester
+		unlock((*arg).mutex[(*arg).index]);
 		(*arg).current = (*arg).current+1;
+		if((*arg).current==1) unlock((*arg).sem_mutex);
 	}
 }
 
 void* wait(semaphore *arg){
-	if(*((*arg).mutex[(*arg).current])==1){
-		//enqueue??
-	}else{
-		(*arg).current = (*arg).current-1;
-		if((*arg).current == 0){lock_TS((*arg).mutex[(*arg).current]);}
+	if((*arg).current==0) lock_TS((*arg).sem_mutex);//while or if???
+	if((*arg).current==0) printf("ERROR 1\n");//pour tester si while ou if
+	else{//else part avec le if de test
+		for(long i=0; i<(*arg).max; i++){
+			if(*((*arg).mutex[i])==0){
+				(*arg).current = (*arg).current-1;
+				lock_TS((*arg).mutex[i]);
+				(*arg).index = i;
+				return NULL;
+			}
+		}
 	}
 }
 
-semaphore* init_S(int maxi){
+semaphore* init_S(int start, int maxi){//start is either 0 or maxi
 	semaphore* arg = malloc(sizeof(semaphore));
 	//init local int start
-	(*arg).current = maxi;
+	(*arg).current = start;
 	(*arg).max = maxi;
 	//init mutex
 	(*arg).mutex = malloc(maxi*sizeof(int));
