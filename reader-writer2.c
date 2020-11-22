@@ -107,10 +107,10 @@ int main_RW2(int writers, int readers){
 		Rid[i]=i+1;
 	}
 	for(i=0; i<writers; i++){
-		pthread_create(&ecrivains[i], NULL, writer, (void*)&(Wid[i]));
+		pthread_create(&ecrivains[i], NULL, writer2, (void*)&(Wid[i]));
 	}
 	for(i=0; i<readers; i++){
-		pthread_create(&lecteurs[i], NULL, reader, (void*)&(Rid[i]));
+		pthread_create(&lecteurs[i], NULL, reader2, (void*)&(Rid[i]));
 	}
 	for(i=0; i<writers; i++){
 		pthread_join(ecrivains[i], NULL);

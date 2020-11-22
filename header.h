@@ -28,11 +28,10 @@ int vmax;
 int nmax;
 int ncurrent;
 typedef struct def{
-	int current;
-	int max;
-	int index;
+	int *current;
+	int *max;
 	int **mutex;
-	int* sem_mutex;
+	int *sem_mutex;
 }semaphore;
 
 // variables globales de RW & RW2
