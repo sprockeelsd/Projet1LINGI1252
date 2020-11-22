@@ -42,8 +42,7 @@ void* lock_BTTS(int *arg){
    			:"%eax"); /* %eax is clobbered register */
    			if(y==0){return NULL;}
    			v = vmin;
-   			while(v*rand()>RAND_MAX/10000)if(v*2<vmax) v*=2;
-   			while(*arg!=0);
+   			while(*arg!=0 || v*rand()>RAND_MAX/10000)if(v*2<vmax) v*=2;
 	}
 	//printf("lock valait 0, maintenant lock vaut %d et y vaut %d \n",*arg,y);
 }

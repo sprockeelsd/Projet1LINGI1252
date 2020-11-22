@@ -38,7 +38,7 @@ perf1-2: main
 perfb: main
 	touch datas.csv
 	bash backoff.sh > datas.csv
-	python3 backoffs.py
+	python3 graphs.py
 	rm -f datas.csv
 	rm -f main
 	
