@@ -2,7 +2,8 @@
 //gcc header.h reader-writer.c philosophers.c producer-consumer.c main.c -o x -lpthread
 
 int main(int argc, char const *argv[]){
-	if(strcmp(argv[1], "-PC")==0){
+	if(argc<3) return(EXIT_SUCCESS);
+	else if(strcmp(argv[1], "-PC")==0){
 		main_PC(atoi(argv[2]),atoi(argv[3]));
 	}
 	else if(strcmp(argv[1], "-RW")==0){
@@ -30,4 +31,5 @@ int main(int argc, char const *argv[]){
 		main_BTTS(atoi(argv[2]),atoi(argv[3]),atoi(argv[4]));
 	}
 	else{printf("Wrong argument\n");}
+	return(EXIT_SUCCESS);
 }
