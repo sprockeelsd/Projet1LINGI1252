@@ -16,8 +16,6 @@ data = pd.read_csv("datas.csv", sep=None, engine='python')
 x=[]
 for i in data:
 	x.append(i)
-	
-print(x)
 
 datanb = data[x[0]].values
 philos = np.array(data[x[2]])
