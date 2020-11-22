@@ -52,9 +52,7 @@ int main_P2(int philosophes){
       		pthread_join(phil[i], NULL);
       	
 	for (i = 0; i < philosophess; i++)
-		printf("CHECK 1\n");
-		//while(rand()>RAND_MAX/10000);//sans ca on crache
-		//printf("%ls\n",baguette2[i]);//ca print rien???
+		printf("CHECK 1 -> %ls\n",baguette2[i]);
 		destroy(baguette2[i]);
 	printf("CHECK 2\n");
 	free(baguette2);

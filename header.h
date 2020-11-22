@@ -30,8 +30,9 @@ int ncurrent;
 typedef struct def{
 	int *current;
 	int *max;
-	int **mutex;
-	int *sem_mutex;
+	int *mutexW;
+	int *mutexP;
+	int *protection;
 }semaphore;
 
 // variables globales de RW & RW2
