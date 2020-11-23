@@ -6,10 +6,10 @@ Les codes sont tous munis de commentaires pour faciliter la compréhension à la
 | Fichier | Description |
 |  :---:  | :---         |
 | Makefile | Inclus les commandes pour compiler notre programme |
-| Script.sh | Effectue les appels de fichier pour mesurer leur performances |
-| header.h | Le fichier header commun pour tous les codes |
-| Rapport_LINFO1252.pdf | Inclus notre rapport de ce projet |
-| graphs.py | Inclus le code pour créer les graphes du projet |
+| Script.sh | Effectue les appels de fichiers pour mesurer leurs performances |
+| header.h | Le fichier header commun pour tous les fichiers .c |
+| Rapport_LINFO1252.pdf | Notre rapport pour ce projet |
+| graphs.py | Le code pour créer les graphes du projet |
 | main.c | Inclus la fonction main des autres codes C  |
 
 # Explication des commandes accessible via Makefile
