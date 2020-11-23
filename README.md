@@ -1,6 +1,6 @@
 # Projet1LINGI1252
 
-Les codes sont tous munis de commentaires pour faciliter la compréhension à la leture de ceux-ci.
+Les codes sont tous munis de commentaires pour faciliter la compréhension à la lecture de ceux-ci.
 
 # Organisation de notre référentiel
 | Fichier | Description |
