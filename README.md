@@ -18,7 +18,7 @@ Les codes sont tous munis de commentaires pour faciliter la compréhension à la
 # Explication des commandes accessible via Makefile
 | Commande | Description |
 |   :---:  | :---         |
-| default | Le default est main ici |
+| default | La commande "make" compile tous nos fichier dans ce répertoire |
 | all | Une combinaison de tous les perf |
 | main | Compile l'entièreté des codes en C |
 | a.out | Lance le debugger gdb |
