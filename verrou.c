@@ -29,9 +29,7 @@ void* lock_TTS(int *arg){ //fonction test-test-set
 
 void* lock_BTTS(int *arg){ //fonction backoff-test-test-set
 	int y = 1;
-	int v = vmin;
-	int wait;
-	int x;
+	int v;
 	while(y!=0){
 		asm (	"movl $1, %%eax;"	//mets 1 dans eax
   			"xchgl %%eax, (%1);"	//echange lock et eax	
