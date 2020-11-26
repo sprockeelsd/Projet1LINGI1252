@@ -59,7 +59,7 @@ for i in range(len(matrixStat)):
 #print(matrixStat)
 #print(y)
 
-plt.figure(figsize=(18, 12))
+plt.figure(figsize=(50, 50))
 
 z = np.linspace(1,freq,freq)
 
