@@ -1,5 +1,5 @@
 #!/usr/bin/bash
-RUNS=20
+RUNS=10
 Times=1000
 declare -i min
 declare -i max1
