@@ -10,7 +10,7 @@ echo "Vmin,empty,BTTS_1,BTTS_2,BTTS_3,min,max1,max2,max3"
 
 for ((i=0;i<$RUNS;i++))
 do
-	for ((k=0;k<$Times;k+=10))
+	for ((k=1;k<$Times;k+=50))
 	do
 		min=${k}
 		max1=${k}*2
