@@ -54,6 +54,7 @@ for i in range(len(matrixStat)):
 #print(y)
 
 z = np.linspace(1,freq,freq)
+if(x[0]=='Vmin') z = np.linspace(1, 1000, 50)
 
 plt.figure(figsize=(50,50))
 plt.subplot(221)
