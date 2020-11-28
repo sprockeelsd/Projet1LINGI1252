@@ -17,9 +17,8 @@ int main_TS(int threads){
 	mutex_TS = init();
 	
 	srand(getpid());
-	
+	//initialisation des threads
 	pthread_t thread[threads];
-	
 	int id[threads];
 	
 	for(int i=0; i<threads; i++){
