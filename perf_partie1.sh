@@ -6,6 +6,7 @@ declare -i two
 
 echo "N° of threads,temps_CC,Philosophers,Producer/Consumer,Reader/Writer,N1,N2"
 
+#ce code en shell teste les trois algorithmes de la partie 1 du projet
 for ((i=0;i<$RUNS;i++))
 do
 	for ((n=1;n<=$NTHREAD;n++))
