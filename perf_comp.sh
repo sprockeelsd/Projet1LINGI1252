@@ -6,6 +6,7 @@ declare -i two
 
 echo "N° of threads,temps_CC,Philosophers,Producer/Consumer,Reader/Writer,Philosophers2,Producer/Consumer2,Reader/Writer2,N1,N2"
 
+#ce code en shell teste les trois algorithmes avec des mutex POSIX et les nôtres
 for ((i=0;i<$RUNS;i++))
 do
 	for ((n=1;n<=$NTHREAD;n++))
