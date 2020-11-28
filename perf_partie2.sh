@@ -4,6 +4,7 @@ let NTHREAD=$(nproc)*2
 
 echo "N° of threads,temps_CC,Test-Set,Test-Test-Set,Backoff-Test-Test-Set"
 
+#ce code en shell teste les trois implémentations de nos verrous
 for ((i=0;i<$RUNS;i++))
 do
 	for ((n=1;n<=$NTHREAD;n++))
