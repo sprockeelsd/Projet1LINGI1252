@@ -17,9 +17,8 @@ int main_TTS(int threads){
 	mutex_TTS = init();
 	
 	srand(getpid());
-	
+	//initialisation des threads
 	pthread_t thread[threads];
-	
 	int id[threads];
 	
 	for(int i=0; i<threads; i++){
