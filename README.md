@@ -1,6 +1,6 @@
 # Projet1LINGI1252
 
-Les codes sont tous munis de commentaires pour faciliter la compréhension à la lecture de ceux-ci.
+Les codes sont tous munis de commentaires pour faciliter la compréhension à la lecture de ceux-ci.\\
 :warning: **Les tests de performances de Backoff-Test-and-Test-and-Set prennent plus de temps que le reste**
 
 # Organisation de notre référentiel
