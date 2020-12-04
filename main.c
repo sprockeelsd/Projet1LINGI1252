@@ -1,6 +1,7 @@
 #include "header.h"
 //gcc header.h reader-writer.c philosophers.c producer-consumer.c main.c -o x -lpthread
 
+//Le code qui redistribue les appels aux bonnes fonctions avec les bon arguments
 int main(int argc, char const *argv[]){
 	if(argc<3) return(EXIT_SUCCESS);
 	else if(strcmp(argv[1], "-PC")==0){

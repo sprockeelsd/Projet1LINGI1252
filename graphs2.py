@@ -32,6 +32,13 @@ for i in datanb:
 
 freq = len(datanb)//c #Nthreads 1...8
 
+
+"""
+Matrix range les mesures présentes dans datas.csv de la maniere suivante:
+-chaque ligne represente la perforance d'une expérience différente
+-chaque colonne represente le nombre de threads utilisés pour l'expérience
+-chaque entrée represente toutes les mesures faites pour la même expérience et les mêmes paramètres
+"""
 matrix = np.empty((6,freq,c))
 for i in range(c):
 	for j in range(1,freq+1):
@@ -43,6 +50,12 @@ for i in range(c):
 		matrix[4][j-1][i] = produc2[index]
 		matrix[5][j-1][i] = reader2[index]
 
+"""
+MatrixStat range les mesures présentes dans datas.csv de la maniere suivante:
+-chaque ligne represente la perforance d'une expérience différente
+-chaque colonne represente le nombre de threads utilisés pour l'expérience
+-chaque entrée represente la moyenne et l'écart type de toutes les mesures faites pour la même expérience et les mêmes paramètres
+"""
 matrixStat = np.empty((6,freq,2))
 for i in range(len(matrix)):
 	for j in range(len(matrix[i])):
@@ -50,6 +63,10 @@ for i in range(len(matrix)):
 		matrixStat[i][j][0] = stat.mean
 		matrixStat[i][j][1] = np.sqrt(stat.variance)
 
+"""
+Y range les mesures présentes dans datas.csv de la maniere suivante:
+les dimensions 2 et 3 ont été échangées pour pouvoir faire le graphe
+"""
 y = np.empty((6,2,freq))
 for i in range(len(matrixStat)):
 	y[i][0] = matrixStat[i][:,0]

@@ -6,8 +6,9 @@ declare -i max1
 declare -i max2
 declare -i max3
 
+#ce code en shell teste le verrou en backoff avec différents temps d'attente minimun et maximum
 echo "Vmin,empty,BTTS_1,BTTS_2,BTTS_3"
-
+make -s 2> /dev/null
 for ((i=0;i<$RUNS;i++))
 do
 	for ((k=1;k<$Times;k+=50))

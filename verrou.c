@@ -1,6 +1,6 @@
 #include "header.h"
 
-void* lock_TS(int *arg){ //fonction test-set
+void* lock_TS(int *arg){ //fonction test-and-set
 	int y = 1;
 	while(y!=0){
 		asm (	"movl $1, %%eax;"	//mets 1 dans eax
@@ -13,7 +13,7 @@ void* lock_TS(int *arg){ //fonction test-set
 	//printf("lock valait 0, maintenant lock vaut %d et y vaut %d \n",*arg,y);	
 }
 
-void* lock_TTS(int *arg){ //fonction test-test-set
+void* lock_TTS(int *arg){ //fonction test-and-test-and-set
 	int y = 1;
 	while(y!=0){
 		asm (	"movl $1, %%eax;"	//mets 1 dans eax
@@ -22,12 +22,12 @@ void* lock_TTS(int *arg){ //fonction test-test-set
     			:"=r"(y)  /* y is output operand */
     			:"r"(arg)   /* x is input operand */
    			:"%eax"); /* %eax is clobbered register */
-   			if(y==0){return NULL;}
-   			while(*arg!=0);
+   		if(y==0){return NULL;}
+   		while(*arg!=0); //attente du unlock pour tester à nouveau la commande atomique
 	}
 }
 
-void* lock_BTTS(int *arg){ //fonction backoff-test-test-set
+void* lock_BTTS(int *arg){ //fonction backoff-test-and-test-and-set
 	int y = 1;
 	int v;
 	while(y!=0){
@@ -37,9 +37,10 @@ void* lock_BTTS(int *arg){ //fonction backoff-test-test-set
     			:"=r"(y)  /* y is output operand */
     			:"r"(arg)   /* x is input operand */
    			:"%eax"); /* %eax is clobbered register */
-   			if(y==0){return NULL;}
-   			v = vmin;
-   			while(*arg!=0 || v*rand()>RAND_MAX/10000)if(v*2<vmax) v*=2;
+   		if(y==0){return NULL;}
+   		v = vmin;
+   		while(*arg!=0 || v*rand()>RAND_MAX/10000)if(v*2<vmax) v*=2; 
+		//attente du unlock pour tester à nouveau la commande atomique avec un temps d'attente additionnel
 	}
 }
 

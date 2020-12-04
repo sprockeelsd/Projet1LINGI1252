@@ -38,64 +38,66 @@ typedef struct def{
 // variables globales de RW & RW2
 int number_of_write;
 int number_of_read;
+int readcount; // nombre de readers en train de lire
+int w;	//nombre d'écrivains en train d'écrire
+
 pthread_mutex_t mutex_RW;
 pthread_mutex_t z;
 pthread_mutex_t m_w;
 int* mutex_RW2;
 int* z2;
 int* m_w2;
+
 sem_t db;  // accès à la db
 sem_t rsem;
 semaphore* db2;
 semaphore* rsem2;
-semaphore* rw[2];
-int readcount; // nombre de readers en train de lire
-int w;	//nombre d'écrivains en train d'écrire
 
 // variables globales de PC & PC2
-pthread_mutex_t mutex_PC;
-int* mutex_PC2;
-sem_t empty;
-sem_t full;
-semaphore* empty2;
-semaphore* full2;
-semaphore* pc[2];
 int buffer[8];
 int in;
 int out;
 
+pthread_mutex_t mutex_PC;
+int* mutex_PC2;
+
+sem_t empty;
+sem_t full;
+semaphore* empty2;
+semaphore* full2;
+
 // variables globales de P & P2
 pthread_mutex_t *baguette;
-int **baguette2;
+int **baguette2; //un tableau de nos mutexs (taille à déterminée)
 int philosophess;
+
+//Fonctions P
+void* philosophe(void* arg);
+int main_P(int philosophes);
+
+//Fonctions P2
+void* philosophe2(void* arg);
+int main_P2(int philosophes);
 
 //Fonctions RW
 void* writer(void* arg);
 void* reader(void* arg);
 int main_RW(int writers, int readers);
 
-//Fonctions PC
-void* producer(void* arg);
-void* consumer(void* arg);
-int main_PC(int producers, int consumers);
-
-//Fonctions P
-void* philosophe(void* arg);
-int main_P(int philosophes);
-
 //Fonctions RW2
 void* writer2(void* arg);
 void* reader2(void* arg);
 int main_RW2(int writers, int readers);
 
+//Fonctions PC
+void* producer(void* arg);
+void* consumer(void* arg);
+int main_PC(int producers, int consumers);
+
 //Fonctions PC2
 void* producer2(void* arg);
 void* consumer2(void* arg);
 int main_PC2(int producers, int consumers);
-
-//Fonctions P2
-void* philosophe2(void* arg);
-int main_P2(int philosophes);
 
 //Fonctions verrou
 void* lock_TS(int *arg);
@@ -103,6 +105,7 @@ void* lock_TTS(int *arg);
 void* lock_BTTS(int *arg);
 void* unlock(int *arg);
 int* init();
+void* init_BTTS(int min, int max);
 void* destroy(int *arg);
 
 //Fonctions TS
@@ -116,7 +119,6 @@ int main_TTS(int n);
 //Fonctions BTTS
 void* test_BTTS(void *arg);
 int main_BTTS(int n, int min, int max);
-void* init_BTTS(int min, int max);
 
 //Fonctions sem
 void* post(semaphore *arg);
