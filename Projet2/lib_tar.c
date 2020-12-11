@@ -16,7 +16,62 @@
  *         -3 if the archive contains a header with an invalid checksum value
  */
 int check_archive(int tar_fd) {
-    return 0;
+    //on sait qu'on est dans un header
+	void* readd = malloc(sizeof(tar_header_t));
+	//lire le header
+	int reading = read(tar_fd,readd,sizeof(tar_header_t));
+	if(reading == -1){
+		free(readd);
+		return 0;
+	}
+	//cast le header lu en la structure de données
+	tar_header_t* header = ((tar_header_t*)readd);
+	//printer(header);
+	
+	if(strcmp(header->magic,TMAGIC)){
+		free(readd);
+		return -1;
+	}if(*(char*)header->version!=48 || *(char*)(header->version+1)!=48){
+		free(readd);
+		return -2;
+	}
+	
+	//vérifier la checksum
+	long int x = TAR_INT(header->chksum);
+	strncpy(header->chksum, "        ", 8); //8e bit est un espace et non \0
+	char* iter = (char*)header;
+	long int checksum = 0;
+	for(int i = 0; i < 512; i++) checksum += *(iter+i);
+	
+	if(checksum != x){
+		free(readd);
+		return -3;
+	}
+	//si le header est correct
+	if(is_dir(tar_fd, header->name) != 0) return 1 + check_archive(tar_fd);
+	
+	else if(is_symlink(tar_fd, header->name) != 0) return 1 + check_archive(tar_fd);
+	
+	else if(is_file(tar_fd, header->name) != 0){
+		if(header->size == 0) return 1 + check_archive(tar_fd);
+		
+		else{
+			int nOfBlocksToSkip = (atoi(header->size) / 512)+1;
+			size_t *nBlocks;
+			*nBlocks = nOfBlocksToSkip*512*sizeof(uint8_t); 
+			uint8_t* file = malloc(nOfBlocksToSkip * 512 * sizeof(uint8_t));
+			ssize_t readfile = read_file(tar_fd, header->name, 0, file, nBlocks);
+			return 1 + check_archive(tar_fd);
+			if(readfile == -1){
+				printf("reading ERROR \n");
+				free(file);
+				return EXIT_FAILURE;
+			}
+			free(file);			
+		}
+	}
+	return 0;
+}
 }
 
 /**
@@ -107,4 +162,25 @@ int list(int tar_fd, char *path, char **entries, size_t *no_entries) {
  */
 ssize_t read_file(int tar_fd, char *path, size_t offset, uint8_t *dest, size_t *len) {
     return 0;
+}
+
+void printer(tar_header_t* header){
+	printf("name = %s \n",header->name);
+	printf("mode = %s \n",header->mode);
+	printf("uid = %s \n",header->uid);
+	printf("gid = %s \n",header->gid);
+	printf("size = %s \n",header->size);
+	printf("mtime = %s \n",header->mtime);
+	printf("chksum = %ld \n",TAR_INT(header->chksum));
+	printf("typeflag = %c \n",header->typeflag);
+	printf("linkname = %s \n",header->linkname);
+	printf("magic = %s \n",header->magic);
+	printf("version1 = %d \n",*(char*)header->version);
+	printf("version2 = %d \n",*(char*)(header->version+1));
+	printf("uname = %s \n",header->uname);
+	printf("gname = %s \n",header->gname);
+	printf("devmajor = %s \n",header->devmajor);
+	printf("devminor = %s \n",header->devminor);
+	printf("prefix = %s \n",header->prefix);
+	printf("padding = %s \n",header->padding);
 }
