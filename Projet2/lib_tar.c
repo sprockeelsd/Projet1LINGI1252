@@ -72,7 +72,6 @@ int check_archive(int tar_fd) {
 	}
 	return 0;
 }
-}
 
 /**
  * Checks whether an entry exists in the archive.

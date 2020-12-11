@@ -4,6 +4,9 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 typedef struct posix_header
 {                              /* byte offset */
