@@ -7,6 +7,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 typedef struct posix_header
 {                              /* byte offset */
@@ -141,5 +144,6 @@ int list(int tar_fd, char *path, char **entries, size_t *no_entries);
 ssize_t read_file(int tar_fd, char *path, size_t offset, uint8_t *dest, size_t *len);
 
 void printer(tar_header_t* header);
+tar_header_t* find(int tar_fd, char *path);
 
 #endif

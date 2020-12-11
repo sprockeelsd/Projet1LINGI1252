@@ -35,8 +35,14 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    int ret = check_archive(fd);
-    printf("check_archive returned %d\n", ret);
+    //int ret = check_archive(fd);
+    //printf("check_archive returned %d\n", ret);
+    
+    //int ret = exists(fd, "skeleton/tests.c");
+    //printf("exists returned %d\n", ret);
+    
+    int ret = exists(fd, "skeleton/");
+    printf("isDir returned %d\n", ret);
 
     return 0;
 }

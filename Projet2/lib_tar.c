@@ -16,61 +16,56 @@
  *         -3 if the archive contains a header with an invalid checksum value
  */
 int check_archive(int tar_fd) {
-    //on sait qu'on est dans un header
+	int magicnumberofheaders = 0;
 	void* readd = malloc(sizeof(tar_header_t));
-	//lire le header
-	int reading = read(tar_fd,readd,sizeof(tar_header_t));
+	int reading = read(tar_fd,readd,sizeof(tar_header_t)); //lire le header
 	if(reading == -1){
 		free(readd);
-		return 0;
+		return -4;
 	}
-	//cast le header lu en la structure de données
-	tar_header_t* header = ((tar_header_t*)readd);
-	//printer(header);
-	
-	if(strcmp(header->magic,TMAGIC)){
-		free(readd);
-		return -1;
-	}if(*(char*)header->version!=48 || *(char*)(header->version+1)!=48){
-		free(readd);
-		return -2;
-	}
-	
-	//vérifier la checksum
-	long int x = TAR_INT(header->chksum);
-	strncpy(header->chksum, "        ", 8); //8e bit est un espace et non \0
-	char* iter = (char*)header;
-	long int checksum = 0;
-	for(int i = 0; i < 512; i++) checksum += *(iter+i);
-	
-	if(checksum != x){
-		free(readd);
-		return -3;
-	}
-	//si le header est correct
-	if(is_dir(tar_fd, header->name) != 0) return 1 + check_archive(tar_fd);
-	
-	else if(is_symlink(tar_fd, header->name) != 0) return 1 + check_archive(tar_fd);
-	
-	else if(is_file(tar_fd, header->name) != 0){
-		if(header->size == 0) return 1 + check_archive(tar_fd);
-		
-		else{
-			int nOfBlocksToSkip = (atoi(header->size) / 512)+1;
-			size_t *nBlocks;
-			*nBlocks = nOfBlocksToSkip*512*sizeof(uint8_t); 
-			uint8_t* file = malloc(nOfBlocksToSkip * 512 * sizeof(uint8_t));
-			ssize_t readfile = read_file(tar_fd, header->name, 0, file, nBlocks);
-			return 1 + check_archive(tar_fd);
-			if(readfile == -1){
-				printf("reading ERROR \n");
-				free(file);
-				return EXIT_FAILURE;
-			}
-			free(file);			
+	tar_header_t* header = ((tar_header_t*)readd); //cast le header lu en la structure de données
+	while(strcmp(header->name,"\0")){
+		//printer(header);
+		if(strcmp(header->magic,TMAGIC)){
+			free(readd);
+			return -1;
+		}if(*(char*)header->version!=48 || *(char*)(header->version+1)!=48){
+			free(readd);
+			return -2;
 		}
+		long int x = TAR_INT(header->chksum);
+		memset(header->chksum, 040, 8);
+		char* iter = (char*)header;
+		long int checksum = 0;
+		for(int i = 0; i < 512; i++) checksum += *(iter+i);
+		
+		if(checksum != x){ //vérifier la checksum
+			free(readd);
+			return -3;
+		}
+		if(!TAR_INT(header->size)) magicnumberofheaders++;
+		else{
+			int nOfBlocksToSkip = (TAR_INT(header->size) / 512)+1;
+			size_t nBlocks = nOfBlocksToSkip*512*sizeof(char);
+			char* file = malloc(nBlocks);
+			//printf("bytes=%ld	blocks=%d	size=%ld\n",nBlocks,nOfBlocksToSkip,TAR_INT(header->size));
+			reading = read(tar_fd,file,nBlocks);
+			if(reading == -1){
+				free(file);
+				free(readd);
+				return -4;
+			}
+			free(file);
+			magicnumberofheaders++;
+		}
+		reading = read(tar_fd,readd,sizeof(tar_header_t)); //lire le header suivant
+		if(reading == -1){
+			free(readd);
+			return -4;
+		}
+		header = ((tar_header_t*)readd);
 	}
-	return 0;
+	return magicnumberofheaders;
 }
 
 /**
@@ -83,7 +78,8 @@ int check_archive(int tar_fd) {
  *         any other value otherwise.
  */
 int exists(int tar_fd, char *path) {
-    return 0;
+	if(find(tar_fd,path)==NULL) return 0;
+	return 1;
 }
 
 /**
@@ -96,7 +92,13 @@ int exists(int tar_fd, char *path) {
  *         any other value otherwise.
  */
 int is_dir(int tar_fd, char *path) {
-    return 0;
+	if(find(tar_fd,path)==NULL) return 0;
+	tar_header_t* header = find(tar_fd, path);
+	if(!strcmp(header->name,path)){
+		if(!TAR_INT(header->size) && !TAR_INT(header->linkname)) return 1;
+		else return 0;
+	}
+	return 0;
 }
 
 /**
@@ -109,7 +111,13 @@ int is_dir(int tar_fd, char *path) {
  *         any other value otherwise.
  */
 int is_file(int tar_fd, char *path) {
-    return 0;
+	if(find(tar_fd,path)==NULL) return 0;
+	tar_header_t* header = find(tar_fd, path);
+	if(!strcmp(header->name,path)){
+		if(TAR_INT(header->size)>0 && !strcmp(header->linkname,"\0")) return 1;
+		else return 0;
+	}
+	return 0;
 }
 
 /**
@@ -121,7 +129,13 @@ int is_file(int tar_fd, char *path) {
  *         any other value otherwise.
  */
 int is_symlink(int tar_fd, char *path) {
-    return 0;
+        if(find(tar_fd,path)==NULL) return 0;
+	tar_header_t* header = find(tar_fd, path);
+	if(!strcmp(header->name,path)){
+		if(!TAR_INT(header->size) && strcmp(header->linkname,"\0")) return 1;
+			else return 0;
+	}
+	return 0;
 }
 
 
@@ -168,7 +182,7 @@ void printer(tar_header_t* header){
 	printf("mode = %s \n",header->mode);
 	printf("uid = %s \n",header->uid);
 	printf("gid = %s \n",header->gid);
-	printf("size = %s \n",header->size);
+	printf("size = %ld \n",TAR_INT(header->size));
 	printf("mtime = %s \n",header->mtime);
 	printf("chksum = %ld \n",TAR_INT(header->chksum));
 	printf("typeflag = %c \n",header->typeflag);
@@ -182,4 +196,25 @@ void printer(tar_header_t* header){
 	printf("devminor = %s \n",header->devminor);
 	printf("prefix = %s \n",header->prefix);
 	printf("padding = %s \n",header->padding);
+}
+
+tar_header_t* find(int tar_fd, char *path){
+	//appel de check_archives?????
+	void* readd = malloc(sizeof(tar_header_t));
+	read(tar_fd,readd,sizeof(tar_header_t));
+	tar_header_t* header = ((tar_header_t*)readd);
+	while(strcmp(header->name,"\0")){
+		printf("name = %s\n",header->name);
+		if(!strcmp(header->name,path)) return header;
+		if(TAR_INT(header->size) > 0){
+			int nOfBlocksToSkip = (TAR_INT(header->size) / 512)+1;
+			size_t nBlocks = nOfBlocksToSkip*512*sizeof(char);
+			char* file = malloc(nBlocks);
+			read(tar_fd,file,nBlocks);
+			free(file);
+		}
+		read(tar_fd,readd,sizeof(tar_header_t));
+		header = ((tar_header_t*)readd);
+	}
+	return NULL;
 }
