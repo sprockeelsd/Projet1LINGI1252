@@ -25,7 +25,6 @@ int check_archive(int tar_fd) {
 	}
 	tar_header_t* header = ((tar_header_t*)readd); //cast le header lu en la structure de données
 	while(strcmp(header->name,"\0")){
-		//printer(header);
 		if(strcmp(header->magic,TMAGIC)){
 			free(readd);
 			return -1;
@@ -48,7 +47,6 @@ int check_archive(int tar_fd) {
 			int nOfBlocksToSkip = (TAR_INT(header->size) / 512)+1;
 			size_t nBlocks = nOfBlocksToSkip*512*sizeof(char);
 			char* file = malloc(nBlocks);
-			//printf("bytes=%ld	blocks=%d	size=%ld\n",nBlocks,nOfBlocksToSkip,TAR_INT(header->size));
 			reading = read(tar_fd,file,nBlocks);
 			if(reading == -1){
 				free(file);
@@ -153,7 +151,12 @@ int is_symlink(int tar_fd, char *path) {
  *         any other value otherwise.
  */
 int list(int tar_fd, char *path, char **entries, size_t *no_entries) {
-    return 0;
+	if(find(tar_fd,path)==NULL) return 0;
+	tar_header_t* header = find(tar_fd, path);
+	while(is_symlink(tar_fd,header->name)) header = find(tar_fd, header->linkname);
+	if(!is_dir(tar_fd, path)) return 0;
+	//enumerer les entrées
+	return 1;
 }
 
 /**
@@ -174,7 +177,13 @@ int list(int tar_fd, char *path, char **entries, size_t *no_entries) {
  *
  */
 ssize_t read_file(int tar_fd, char *path, size_t offset, uint8_t *dest, size_t *len) {
-    return 0;
+	if(find(tar_fd,path)==NULL) return 0;
+	tar_header_t* header = find(tar_fd, path);
+	if(!strcmp(header->name,path)){
+		if(TAR_INT(header->size)>0 && !strcmp(header->linkname,"\0")) return 1;
+		else return 0;
+	}
+	return 0;
 }
 
 void printer(tar_header_t* header){
