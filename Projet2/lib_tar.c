@@ -37,25 +37,16 @@ int check_archive(int tar_fd) {
 		char* iter = (char*)header;
 		long int checksum = 0;
 		for(int i = 0; i < 512; i++) checksum += *(iter+i);
-		
 		if(checksum != x){ //vérifier la checksum
 			free(readd);
 			return -3;
 		}
-		if(!TAR_INT(header->size)) magicnumberofheaders++;
-		else{
+		if(TAR_INT(header->size)){
 			int nOfBlocksToSkip = (TAR_INT(header->size) / 512)+1;
 			size_t nBlocks = nOfBlocksToSkip*512*sizeof(char);
-			char* file = malloc(nBlocks);
-			reading = read(tar_fd,file,nBlocks);
-			if(reading == -1){
-				free(file);
-				free(readd);
-				return -4;
-			}
-			free(file);
-			magicnumberofheaders++;
+			lseek(tar_fd,nBlocks,SEEK_CUR);
 		}
+		magicnumberofheaders++;
 		reading = read(tar_fd,readd,sizeof(tar_header_t)); //lire le header suivant
 		if(reading == -1){
 			free(readd);
@@ -63,6 +54,7 @@ int check_archive(int tar_fd) {
 		}
 		header = ((tar_header_t*)readd);
 	}
+	free(readd);
 	return magicnumberofheaders;
 }
 
@@ -77,6 +69,7 @@ int check_archive(int tar_fd) {
  */
 int exists(int tar_fd, char *path) {
 	if(find(tar_fd,path)==NULL) return 0;
+	free_me();
 	return 1;
 }
 
@@ -91,12 +84,13 @@ int exists(int tar_fd, char *path) {
  */
 int is_dir(int tar_fd, char *path) {
 	tar_header_t* header = find(tar_fd, path);
-	if(header==NULL) return -1;
-	if(!strcmp(header->name,path)){ //inspect name
-		char* namnam = header->name;
-		if(!TAR_INT(header->size) && !TAR_INT(header->linkname) && !strcmp(namnam+strlen(namnam)-1,"/")) return 1;
-		else return 0;
+	if(header==NULL) return 0;
+	char* namnam = header->name;
+	if(!TAR_INT(header->size) && !TAR_INT(header->linkname) && !strcmp(namnam+strlen(namnam)-1,"/")){
+		free_me();
+		return 1;
 	}
+	free_me();
 	return 0;
 }
 
@@ -111,12 +105,13 @@ int is_dir(int tar_fd, char *path) {
  */
 int is_file(int tar_fd, char *path) {
 	tar_header_t* header = find(tar_fd, path);
-	if(header==NULL) return -1;
-	if(!strcmp(header->name,path)){ //inspect the name
-		char* namnam = header->name;
-		if(strcmp(namnam+strlen(namnam)-1,"/")!=0 && !strcmp(header->linkname,"\0")) return 1;
-		else return 0;
+	if(header==NULL) return 0;
+	char* namnam = header->name;
+	if(strcmp(namnam+strlen(namnam)-1,"/")!=0 && !strcmp(header->linkname,"\0")){
+		free_me();
+		return 1;
 	}
+	free_me();
 	return 0;
 }
 
@@ -130,11 +125,12 @@ int is_file(int tar_fd, char *path) {
  */
 int is_symlink(int tar_fd, char *path) {
         tar_header_t* header = find(tar_fd, path);
-	if(header==NULL) return -1;
-	if(!strcmp(header->name,path)){
-		if(!TAR_INT(header->size) && strcmp(header->linkname,"\0")) return 1;
-			else return 0;
+	if(header==NULL) return 0;
+	if(!TAR_INT(header->size) && strcmp(header->linkname,"\0")!=0){
+		free_me();
+		return 1;
 	}
+	free_me();
 	return 0;
 }
 
@@ -153,14 +149,31 @@ int is_symlink(int tar_fd, char *path) {
  *         any other value otherwise.
  */
 int list(int tar_fd, char *path, char **entries, size_t *no_entries) {
+	int x = *no_entries;
+	*no_entries = 0;
 	tar_header_t* header = find(tar_fd, path);
-	if(header==NULL) return -1;
-	while(!TAR_INT(header->size) && strcmp(header->linkname,"\0")) header = find(tar_fd, header->linkname);
+	if(header==NULL) return 0;
+	while(!TAR_INT(header->size) && strcmp(header->linkname,"\0")!=0){
+		char* namnam2 = header->linkname;
+		if(strcmp(namnam2+strlen(namnam2)-1,"/")!=0) strcat(namnam2, "/");
+		if(strlen(strchr(namnam2,'/'))<2 && strchr(header->name,'/')!=NULL){ //chemin relatif???
+			char* temp = malloc(100*sizeof(char));
+			memcpy(temp, header->name, strlen(header->name)-strlen(strchr(header->name,'/'))+1);
+			strcat(temp, namnam2);
+			strcpy(namnam2, temp);
+			free(temp);
+		}//printf("namnam = %s\n",namnam2);
+		header = find(tar_fd, namnam2);
+		if(header==NULL) return 0;
+	}
 	char* namnam = header->name;
-	if(TAR_INT(header->size) || TAR_INT(header->linkname) || strcmp(namnam+strlen(namnam)-1,"/")!=0) return 0;
+	if(TAR_INT(header->size) || TAR_INT(header->linkname) || strcmp(namnam+strlen(namnam)-1,"/")!=0){
+		free_me();
+		return 0;
+	}
 	char* directory = header->name;
 	int length = strlen(directory);
-	char compare[length+1]; //printf("dir = %s\n",directory);
+	char* compare = malloc(100*sizeof(char));
 	//enumerer les entrées
 	int nbEntries = 0;
 	void* readd = malloc(sizeof(tar_header_t));
@@ -168,25 +181,38 @@ int list(int tar_fd, char *path, char **entries, size_t *no_entries) {
 	header = ((tar_header_t*)readd);
 	while(strcmp(header->name,"\0")){
 		//comparer les entree
-		memcpy(compare, header->name, length); //printf("name = %s\n",header->name);
+		memcpy(compare, header->name, length);
 		compare[length] = '\0';
-		printf("compare = %s\n",compare);
 		if(!strcmp(compare,directory)){
-			if(nbEntries<*no_entries) entries[nbEntries] = header->name;
-			nbEntries++;
+			if(strchr(header->name+length,'/')!=NULL){
+				if(strlen(strchr(header->name+length,'/'))==1 && nbEntries<x){
+					if(!TAR_INT(header->size) && strcmp(header->linkname,"\0")!=0){
+						char* temp = strcat(header->name+length, " -> ");
+						strcpy(*(entries+nbEntries), strcat(temp, header->linkname));
+					}else strcpy(*(entries+nbEntries), header->name+length);
+					nbEntries++;
+				}
+			}else if(nbEntries<x){
+				if(!TAR_INT(header->size) && strcmp(header->linkname,"\0")!=0){
+					char* temp = strcat(header->name+length, " -> ");
+					strcpy(*(entries+nbEntries), strcat(temp, header->linkname));
+				}else strcpy(*(entries+nbEntries), header->name+length);
+				nbEntries++;
+			}
 		}
 		if(TAR_INT(header->size)){
 			int nOfBlocksToSkip = (TAR_INT(header->size) / 512)+1;
 			size_t nBlocks = nOfBlocksToSkip*512*sizeof(char);
-			char* file = malloc(nBlocks);
-			read(tar_fd,file,nBlocks);
-			free(file);
+			lseek(tar_fd,nBlocks,SEEK_CUR);
 		}
-		read(tar_fd,readd,sizeof(tar_header_t)); //lire le header suivant
+		read(tar_fd,readd,sizeof(tar_header_t));
 		header = ((tar_header_t*)readd);
 	}
-	if(nbEntries<*no_entries) *no_entries = nbEntries;
-	return nbEntries;
+	free(compare);
+	free(readd);
+	free_me();
+	if(nbEntries<x) *no_entries = nbEntries;
+	return 1;
 }
 
 /**
@@ -209,23 +235,61 @@ int list(int tar_fd, char *path, char **entries, size_t *no_entries) {
 ssize_t read_file(int tar_fd, char *path, size_t offset, uint8_t *dest, size_t *len) {
 	tar_header_t* header = find(tar_fd, path);
 	if(header==NULL) return -1;
-	while(!TAR_INT(header->size) && strcmp(header->linkname,"\0")) header = find(tar_fd, header->linkname);
+	while(!TAR_INT(header->size) && strcmp(header->linkname,"\0")){
+		header = find(tar_fd, header->linkname);
+		if(header==NULL) return -1;
+	}
 	int length = TAR_INT(header->size);
 	char* namnam = header->name;
-	if(!strcmp(namnam+strlen(namnam)-1,"/") && strcmp(header->linkname,"\0")) return -1;
-	else if(length<=offset) return -2;
+	if(!strcmp(namnam+strlen(namnam)-1,"/") || strcmp(header->linkname,"\0")!=0){
+		free_me();
+		return -1;
+	}
+	else if(length<=offset){
+		free_me();
+		return -2;
+	}
 	int reader = length-offset;
 	if(reader>*len){
-		read(tar_fd,dest,offset);
+		lseek(tar_fd,offset,SEEK_CUR);
 		read(tar_fd,dest,*len);
-		return *len;
+		free_me();
+		return reader-*len;
 	}else{
 		*len = reader;
-		read(tar_fd,dest,offset);
+		lseek(tar_fd,offset,SEEK_CUR);
 		read(tar_fd,dest,reader);
+		free_me();
 		return 0;
 	}
-	return -1;
+}
+
+tar_header_t* find(int tar_fd, char *path){
+	lseek(tar_fd,0,SEEK_SET);
+	void* readd = malloc(sizeof(tar_header_t));
+	read(tar_fd,readd,sizeof(tar_header_t));
+	header1 = malloc(sizeof(tar_header_t));
+	memcpy(header1, (tar_header_t*)readd, sizeof(tar_header_t));
+	while(strcmp(header1->name,"\0")){
+		if(!strcmp(header1->name,path)){
+			free(readd);
+			return header1;
+		}
+		if(TAR_INT(header1->size) > 0){
+			int nOfBlocksToSkip = (TAR_INT(header1->size) / 512)+1;
+			size_t nBlocks = nOfBlocksToSkip*512*sizeof(char);
+			lseek(tar_fd,nBlocks,SEEK_CUR);
+		}
+		read(tar_fd,readd,sizeof(tar_header_t));
+		memcpy(header1, (tar_header_t*)readd, sizeof(tar_header_t));
+	}
+	free_me();
+	free(readd);
+	return NULL;
+}
+
+void free_me(){
+	free(header1);
 }
 
 void printer(tar_header_t* header){
@@ -247,25 +311,4 @@ void printer(tar_header_t* header){
 	printf("devminor = %s \n",header->devminor);
 	printf("prefix = %s \n",header->prefix);
 	printf("padding = %s \n",header->padding);
-}
-
-tar_header_t* find(int tar_fd, char *path){
-	//appel de check_archives?????
-	void* readd = malloc(sizeof(tar_header_t));
-	read(tar_fd,readd,sizeof(tar_header_t));
-	tar_header_t* header = ((tar_header_t*)readd);
-	while(strcmp(header->name,"\0")){
-		//printf("name = %s\n",header->name);
-		if(!strcmp(header->name,path)) return header;
-		if(TAR_INT(header->size) > 0){
-			int nOfBlocksToSkip = (TAR_INT(header->size) / 512)+1;
-			size_t nBlocks = nOfBlocksToSkip*512*sizeof(char);
-			char* file = malloc(nBlocks);
-			read(tar_fd,file,nBlocks);
-			free(file);
-		}
-		read(tar_fd,readd,sizeof(tar_header_t));
-		header = ((tar_header_t*)readd);
-	}
-	return NULL;
 }

@@ -47,6 +47,9 @@ typedef struct posix_header
 /* Converts an ASCII-encoded octal-based number into a regular integer */
 #define TAR_INT(char_ptr) strtol(char_ptr, NULL, 8)
 
+/* Global variable  */
+tar_header_t* header1;
+
 /**
  * Checks whether the archive is valid.
  *
@@ -145,5 +148,6 @@ ssize_t read_file(int tar_fd, char *path, size_t offset, uint8_t *dest, size_t *
 
 void printer(tar_header_t* header);
 tar_header_t* find(int tar_fd, char *path);
+void free_me();
 
 #endif
